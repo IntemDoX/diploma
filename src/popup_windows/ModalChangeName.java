@@ -8,25 +8,26 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.ModalChangeNameObservable;
 import models.ModalChangeNameObserver;
+import models.ScreenshotMaker;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModalChangeName implements ModalChangeNameObservable {
-    private String newName;
+    private String newName = "";
     private List<ModalChangeNameObserver> modalChangeNameObservers;
+    ScreenshotMaker screenshotMaker;
 
     private Stage changeNameStage;
     private TextField textField;
 
     public ModalChangeName(){
+        screenshotMaker = ScreenshotMaker.getInstance();
         modalChangeNameObservers = new ArrayList<>();
         changeNameStage = new Stage();
-
+        screenshotMaker.setModalChangeName(this);
         Pane root = new Pane();
         root.setStyle("-fx-background-color:tan;-fx-padding:10px;");
-
-
 
         textField = new TextField();
         textField.setMinWidth(180);
@@ -52,6 +53,7 @@ public class ModalChangeName implements ModalChangeNameObservable {
     private void changeName(){
         newName = textField.getText();
         notifyObservers();
+        System.out.println(newName);
         textField.clear();
         changeNameStage.close();
     }
@@ -68,7 +70,7 @@ public class ModalChangeName implements ModalChangeNameObservable {
     @Override
     public void notifyObservers() {
         for(ModalChangeNameObserver modalChangeNameObserver : modalChangeNameObservers){
-            modalChangeNameObserver.update(newName);
+            modalChangeNameObserver.updateName(newName, null);
         }
     }
 

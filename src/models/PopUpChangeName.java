@@ -1,4 +1,4 @@
-package models;
+/*package models;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -9,9 +9,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-/**
- * Created by Vladislav on 26.11.2015.
- */
+
 public class PopUpChangeName extends Application {
     Button btnscene1, btnscene2;
     Label lblscene1, lblscene2;
@@ -50,4 +48,4 @@ public class PopUpChangeName extends Application {
         else
             newStage.close();
     }
-}
+}*/

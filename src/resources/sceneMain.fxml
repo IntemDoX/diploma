@@ -25,8 +25,11 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <RadioButton fx:id="rbNo" layoutX="131.0" layoutY="287.0" mnemonicParsing="false" text="no" textFill="#f80000" />
-            <RadioButton fx:id="rbYes" layoutX="131.0" layoutY="306.0" mnemonicParsing="false" text="yes" textFill="#f80000" />
+            <RadioButton fx:id="rbNo" layoutX="131.0" layoutY="287.0" mnemonicParsing="false" onAction="#makeScreenNo" selected="true" text="false" textFill="#f80000">
+               <toggleGroup>
+                  <ToggleGroup fx:id="toggleGroup" />
+               </toggleGroup></RadioButton>
+            <RadioButton fx:id="rbYes" layoutX="131.0" layoutY="306.0" mnemonicParsing="false" onAction="#makeScreenYes" text="true" textFill="#f80000" toggleGroup="$toggleGroup" />
             <Button fx:id="btnTotalTime" layoutX="187.0" layoutY="283.0" mnemonicParsing="false" onAction="#showTotalTime" prefHeight="40.0" prefWidth="408.0" text="Total" />
          </children></Pane>
    </center>

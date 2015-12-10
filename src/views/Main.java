@@ -1,8 +1,5 @@
 package views;
 
-
-
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -12,36 +9,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import models.Counter;
+import models.MainAnimationTimer;
 import models.Occasion;
 import models.WindowsFactory;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 
 
 public class Main extends Application{
     private Scene scene;
     private Stage stage;
-    Parent root;
+    private Parent root;
 
-
-
-
-    //    @FXML
-//    private TableView<Occasion> tableViewResult;
-//    @FXML
-//    private TableColumn tableColumnProgram, tableColumnTime;
-
-    public static  ObservableList<Occasion> occasions = FXCollections.observableArrayList();
-
-    private static final String iconImageLoc =
-            "http://icons.iconarchive.com/icons/scafer31000/bubble-circle-3/16/GameCenter-icon.png";
-    public static String actWin = "";
-    public static String previousWind = "";
-    public static HashMap<String, Long> storyList = new HashMap<>();
+    private static String iconImageLoc;
 
 
 //    private void initTable(){
@@ -58,7 +42,6 @@ public class Main extends Application{
     private void initContent(){
         try {
             root = FXMLLoader.load(getClass().getResource("/resources/sceneMain.fxml"));
-
         }catch (IOException e) {
             System.out.println("Произошла ошибка в методе initContent  -> IOException");
             e.printStackTrace();
@@ -67,24 +50,27 @@ public class Main extends Application{
             e.printStackTrace();
         }
 
-    }
-    private void setScene(){
+        try{
+            iconImageLoc = "http://icons.iconarchive.com/icons/scafer31000/bubble-circle-3/16/GameCenter-icon.png";
+        }catch (Exception e){
+            System.out.println("Error loading images");
+        }
         this.scene = new Scene(root);
-        this.stage.setScene(scene);
-        this.scene.setOnMouseClicked(event -> stage.hide());
+
+       // this.scene.setOnMouseClicked(event -> stage.hide());
         //scene.setFill(Color.TRANSPARENT); // - сцена прозрачная
 
     }
 
     private void setStage(){
+        this.stage.setScene(scene);
         this.stage.setTitle("Какаааа");
-      //  this.stage.initStyle(StageStyle.TRANSPARENT); //Стиль Окна. Убирает Кнопку ЗАКРЫТЬ и вообще это.
+        //this.stage.initStyle(StageStyle.TRANSPARENT); //Стиль Окна. Убирает Кнопку ЗАКРЫТЬ и вообще это.
         this.stage.setResizable(false);
         //this.stage.fullScreenProperty();
         this.stage.toBack();
-       // this.stage.close();
+        //this.stage.close();
         this.stage.show();
-
     }
 
     private void doSettingsOfWindow(final Stage stage){
@@ -99,18 +85,14 @@ public class Main extends Application{
         });
     }
 
-
     @Override
     public void start(final Stage stage) throws Exception {
         initContent();
         this.stage = stage;
-        setScene();
 
         doSettingsOfWindow(this.stage);
         doSettingsOfWindowClosing(this.stage);
         setStage();
-
-
 
 
 //"-fx-background-color: rgba(255, 255, 255, 0.5);"
@@ -118,59 +100,13 @@ public class Main extends Application{
                 "-fx-background-color: rgba(255, 255, 255, 0.5);"//Прозрачность окна = 0
         );*/
 
-/**
- * событие вызывается каждый кадр нашего приложения.(например кждые 100мс, не знаю).
- * тут мы выводим в консоль текущее приложение.
- */
-        AnimationTimer aa = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                WindowsFactory.takeActWin();
-                if (actWin.equals(WindowsFactory.winList.get(0))) {
-//                    storyList.put(actWin, storyList.get(actWin)+Counter.differentData);
-                  // System.out.println(Counter.differentData + "                        " + storyList.get(actWin));
-                } else {
-                    Counter.stopRun();
-
-                    actWin = WindowsFactory.winList.get(0);
-                    previousWind = WindowsFactory.winList.get(1);
-                    if(storyList.containsKey(previousWind)){
-                        storyList.put(previousWind, storyList.get(previousWind)+Counter.differentData);
-                    }
-                    if (storyList.containsKey(actWin)) {
-                        Counter.differentData = storyList.get(actWin);
-                    } else {
-                        storyList.put(actWin, 1L);
-                        Counter.differentData = storyList.get(actWin);
-                    }
-                    //actWin = new String(actWin);
-                    Counter.startTimer();
-                    System.out.println(actWin + " проработала " + Counter.getWorkTimeMessage(storyList.get(actWin)));
-
-                    occasions.add(new Occasion(actWin,Counter.getWorkTimeMessage(storyList.get(actWin)),Counter.beginDate.toString()));
-                    //Делаем скриншот
-                    //ScreenshotMaker.getScreenshot();
-                }
-                WindowsFactory.winList.clear();
-            }
-
-        };
+        AnimationTimer aa = new MainAnimationTimer();
         aa.start();
-
     }
-
 
     public static void main(String[] args) {
         launch(args);
     }
-
-
-
-
-
-
-
-
 
     private void addAppToTray() {
         try {
@@ -205,7 +141,6 @@ public class Main extends Application{
             java.awt.Font boldFont = defaultFont.deriveFont(java.awt.Font.BOLD);
             openItem.setFont(boldFont);
 
-
             // to really exit the application, the user must go to the system tray icon
             // and select the exit option, this will shutdown JavaFX and remove the
             // tray icon (removing the tray icon will also shut down AWT).
@@ -227,6 +162,7 @@ public class Main extends Application{
             e.printStackTrace();
         }
     }
+
     private void showStage() {
         if (stage != null) {
             stage.show();
@@ -234,46 +170,5 @@ public class Main extends Application{
         }
     }
 
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

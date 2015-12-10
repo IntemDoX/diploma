@@ -1,23 +1,21 @@
 package models;
 
 import javafx.beans.property.SimpleStringProperty;
+import java.util.Date;
 
-/**
- * Класс события, которое мы записываем.
- */
 public class Occasion {
     private final SimpleStringProperty program;
     private final SimpleStringProperty time;
-    private final SimpleStringProperty date;
+    private final Date date;
 
-    public Occasion(String name, String workTime, String date) {
+    public Occasion(String name, String workTime, Date date) {
         this.program = new SimpleStringProperty(name);
         this.time = new SimpleStringProperty(workTime);
-        this.date = new SimpleStringProperty(date);
+        this.date = date;
 
     }
 
-    public String getProgram() {
+    /*public String getProgram() {
         return program.get();
     }
 
@@ -25,7 +23,7 @@ public class Occasion {
         return time.get();
     }
 
-    public String getDate() {
-        return date.get();
-    }
+    public Date getDate() {
+        return date;
+    }*/
 }

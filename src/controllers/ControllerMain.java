@@ -5,48 +5,48 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
-import models.ModalChangeNameObserver;
-import models.ScreenshotMaker;
+import models.*;
 import popup_windows.ModalChangeName;
-import models.Occasion;
-import popup_windows.ModalTotalTime;
-import views.Main;
+import popup_windows.ModalTotalResults;
 
 import java.io.File;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-
-/**
- * это котроллер к FXML - представлени.
- */
-public class ControllerMain implements ModalChangeNameObserver {
-
-
+public class ControllerMain implements ModalChangeNameObserver, MakeScreenObservable, ModalChangeNameObservable{
+    private OccasionsStorage occasions= OccasionsStorage.getInstance();
     @FXML
     private TableView<Occasion> tableViewResult;
     @FXML
-    private TableColumn<String,String> tableColumnProgram, tableColumnTime;
-    /*@FXML
-    private Button btnTotalTime, btnChooseDirectory, btnChangeName;*/
+    private TableColumn<Occasion,String> tableColumnProgram, tableColumnTime;
     @FXML
     private Label lblDirectory, lblName;
-    /*@FXML
-    private RadioButton rbYes, rbNo;*/
 
-    private ModalTotalTime modalTotalTime = new ModalTotalTime();
+    private List<MakeScreenObserver> makeScreenObservers;
+//    private List<ModalChangeNameObserver> modalChangeNameObservers;
+    private List<ModalChangeNameObserver> modalChangeNameObservers;
+
+    private String screenPath = "";
+
+
     private static boolean tableInit = false;
-
-   // private static Stage mainStage;
-
+    HistoryStorage uniqueList;
     private ModalChangeName modalChangeName = new ModalChangeName();
-   // ScreenshotMaker screenshotMaker = new ScreenshotMaker(modalChangeName);
+
+    ScreenshotMaker screenshotMaker;
 
     public ControllerMain(){
-        //this.modalChangeName = modalChangeName;
-        modalChangeName.registerObserver(this);
-      initTable();
+        uniqueList = HistoryStorage.getInstance();
+        makeScreenObservers = new ArrayList<>();
+        screenshotMaker = ScreenshotMaker.getInstance();
+        registerScreenObserver(screenshotMaker);
+        modalChangeNameObservers = new ArrayList<>();
+        screenshotMaker.setModalChangeName(this);
+        //modalChangeName.registerObserver(screenshotMaker);
+
+        initTable();
     }
+
 
     @FXML
     private void showTotalTime(){
@@ -55,32 +55,31 @@ public class ControllerMain implements ModalChangeNameObserver {
         System.out.println();
         System.out.println();
         System.out.println("Отчёт: ");
-
-        //Тут открываем табличку, где у нас загружаются все программы. Для этого создать отдельное представление. Вывести в отдельный класс. New TotalResults.
-
-        modalTotalTime.showAndWait();
-
-     /* for(Map.Entry<String, Long> m : Main.storyList.entrySet()){
-          System.out.println("Программа: " + m.getKey() + " проработала " + m.getValue() + " секунд");
-      }*/
+        System.out.println(System.getProperty("user.name"));
+        for(UniqueOccasion a : uniqueList.getUniqueList()){
+            System.out.println("Программа " + a.getNameOfProgram() + " проработала " + a.getValue());
+        }
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        ModalTotalResults a = new ModalTotalResults();
     }
 
-    /**
-     * Change the directory to save screenshots.
-     * To fix: do it right. Don't use static methods of ScreenshotMaker.
-     */
     @FXML
     private void changeDirectory(){
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser.showDialog(lblDirectory.getScene().getWindow());
-        if(selectedDirectory == null){
+        if(selectedDirectory == null)
             lblDirectory.setText("No Directory selected");
-        }
         else{
             lblDirectory.setText(selectedDirectory.getAbsolutePath());
-            ScreenshotMaker.setPath(selectedDirectory.getAbsolutePath());                                               //TO FIX!
+            screenPath = selectedDirectory.getAbsolutePath();
+            notifyObservers();
         }
     }
+
     @FXML
     private void changeName(){
         System.out.println("Change name -> Open modal window;");
@@ -88,7 +87,6 @@ public class ControllerMain implements ModalChangeNameObserver {
     }
 
     private void initTable(){
-
         Task task = new Task<Void>() {
             @Override public Void call() {
                 System.out.println("Initialize table...");
@@ -97,7 +95,7 @@ public class ControllerMain implements ModalChangeNameObserver {
                         tableViewResult.setEditable(true);
                         tableColumnProgram.setCellValueFactory(new PropertyValueFactory<>("program"));
                         tableColumnTime.setCellValueFactory(new PropertyValueFactory<>("time"));
-                        tableViewResult.setItems(Main.occasions);
+                        tableViewResult.setItems(occasions.getOccasions());
                         tableInit = true;
                         System.out.println("SUCCESS: Table was initialize;");
                     } else {
@@ -121,12 +119,54 @@ public class ControllerMain implements ModalChangeNameObserver {
         return tableInit;
     }
 
-    public void setLblNameText(String s) {
-        this.lblName.setText(s);
+    @Override
+    public void updateName(String text, String path) {
+        lblName.setText(text);
     }
 
     @Override
-    public void update(String text) {
-        lblName.setText(text);
+    public void registerScreenObserver(MakeScreenObserver o) {
+        makeScreenObservers.add(o);
+    }
+
+    @Override
+    public void removeScreenObserver(MakeScreenObserver o) {
+        makeScreenObservers.remove(o);
+    }
+
+    @Override
+    public void notifyScreenObservers(boolean a) {
+        for(MakeScreenObserver b : makeScreenObservers){
+            b.setMakeScreenObserver(a);
+        }
+    }
+
+    @Override
+    public void registerObserver(ModalChangeNameObserver o) {
+        modalChangeNameObservers.add(o);
+    }
+
+    @Override
+    public void removeObserver(ModalChangeNameObserver o) {
+        modalChangeNameObservers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for(ModalChangeNameObserver s : modalChangeNameObservers){
+            s.updateName("ПУУУУУУУУУть", screenPath);
+            System.out.println("ЛАЛАЛАЛАЛАЛАЛ");
+        }
+    }
+
+    @FXML
+    private void makeScreenNo(){
+        screenshotMaker.setMake(false);
+        System.out.println("FALSE");
+    }
+    @FXML
+    private void makeScreenYes(){
+        screenshotMaker.setMake(true);
+        System.out.println("TRUE");
     }
 }

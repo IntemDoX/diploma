@@ -1,5 +1,5 @@
 package models;
 
 public interface ModalChangeNameObserver {
-    void update(String text);
+    void updateName(String name, String path);
 }
